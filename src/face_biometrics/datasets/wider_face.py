@@ -36,40 +36,44 @@ class WiderFaceDataset(FaceDataset):
 
             faces = []
 
-            for _ in range(num_faces):
-                parts = lines[i].split()
+            if num_faces == 0:
+                #WIDER FACE stores a dummy annotation line for images with no valid faces.
                 i += 1
+            else:
+                for _ in range(num_faces):
+                    parts = lines[i].split()
+                    i += 1
 
-                if len(parts) < 4:
-                    raise ValueError(
-                        f"Invalid annotation line: {lines[i - 1]}"
+                    if len(parts) < 4:
+                        raise ValueError(
+                            f"Invalid annotation line: {lines[i - 1]}"
+                        )
+
+                    x = float(parts[0])
+                    y = float(parts[1])
+                    width = float(parts[2])
+                    height = float(parts[3])
+
+                    # WIDER FACE may contain invalid annotations.
+                    invalid = int(parts[7]) if len(parts) > 7 else 0
+
+                    if invalid:
+                        continue
+
+                    bbox = BoundingBox(
+                        x1=x,
+                        y1=y,
+                        x2=x + width,
+                        y2=y + height,
                     )
 
-                x = float(parts[0])
-                y = float(parts[1])
-                width = float(parts[2])
-                height = float(parts[3])
-
-                # WIDER FACE may contain invalid annotations.
-                invalid = int(parts[7]) if len(parts) > 7 else 0
-
-                if invalid:
-                    continue
-
-                bbox = BoundingBox(
-                    x1=x,
-                    y1=y,
-                    x2=x + width,
-                    y2=y + height,
-                )
-
-                faces.append(
-                    FaceAnnotation(
-                        bbox=bbox,
-                        landmarks=None,
-                        identity=None,
+                    faces.append(
+                        FaceAnnotation(
+                            bbox=bbox,
+                            landmarks=None,
+                            identity=None,
+                        )
                     )
-                )
 
             samples.append(
                 FaceSample(
