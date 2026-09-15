@@ -20,7 +20,7 @@ class WiderFaceDataset(FaceDataset):
         samples = []
 
         with self.annotation_file.open("r") as f:
-            lines = [line.strip() for line in f]
+            lines = [line.strip() for line in f if line.strip()]
 
         i = 0
 
